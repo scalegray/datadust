@@ -1,5 +1,5 @@
 package monit
-
+/*
 import (
 
  "fmt"
@@ -15,8 +15,9 @@ func (c *Memory) SysExec() {
   fmt.Println("inside memory data------------")
  //statData, _ :=  procRead(STAT)
 }
- func (m *Memory) Send() {}
+ //func (m *Memory) Send() {}
 
 func init() {
  RegisterPlugin("memory", &Memory{})
 }
+*/

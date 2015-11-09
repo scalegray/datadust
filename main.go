@@ -17,21 +17,14 @@
 
 package main
 
-import (
-	//  "fmt"
-	"github.com/scalegray/datadust/monit"
-)
+import "github.com/scalegray/datadust/monit"
 
 const CPU = "cpu"
 
 func main() {
-	//create a  main collector that holds all the struct arrays
+	collector := &monit.Collector{}
 	for _, p := range monit.Plugins {
-		//Execute(p)
-		p.SysExec()
+		p.SysExec(collector)
+		//p.Send(monitChannel)
 	}
-}
-
-func Execute(p monit.Monit) {
-	go p.SysExec()
 }

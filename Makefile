@@ -66,7 +66,7 @@ _datadust:
 
 _datadustr:
 	sudo ./datadust start
-	rm -f datadust
+#	rm -f datadust
 
 test: _go_test _datadust _datadustr
 
