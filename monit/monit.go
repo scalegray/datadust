@@ -2,13 +2,13 @@ package monit
 
 
 import (
-  "fmt"
+//  "fmt"
   log "github.com/Sirupsen/logrus"
 )
 
 type Monit interface {
 
-  Collect()
+  SysExec() (*CpuStat)
   Send()
 }
 

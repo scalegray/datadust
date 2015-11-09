@@ -12,31 +12,26 @@
 ** WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
 ** See the License for the specific language governing permissions and
 ** limitations under the License.
-** 
-*/
+**
+ */
 
 package main
 
-
 import (
-  "fmt"
-  "github.com/scalegray/datadust/monit"
-
+	//  "fmt"
+	"github.com/scalegray/datadust/monit"
 )
 
 const CPU = "cpu"
 
 func main() {
-
-//1. get from config
-var monitElements [4]string
-monitElements[0] = CPU
-
-
-for _, x := range monitElements {
-    //2. execute each plugin concurrently
-    //3.store it in influxDB
+	//create a  main collector that holds all the struct arrays
+	for _, p := range monit.Plugins {
+		//Execute(p)
+		p.SysExec()
+	}
 }
 
-
+func Execute(p monit.Monit) {
+	go p.SysExec()
 }
