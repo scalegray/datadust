@@ -17,14 +17,32 @@
 
 package main
 
-import "github.com/scalegray/datadust/monit"
+import (
+	"fmt"
+	"net/http"
+	"time"
+
+	"github.com/scalegray/datadust/monitor"
+)
 
 const CPU = "cpu"
 
 func main() {
-	collector := &monit.Collector{}
-	for _, p := range monit.Plugins {
+	for {
+		Monitor()
+		time.Sleep(100 * time.Millisecond)
+
+	}
+	http.ListenAndServe("localhost:9999", nil)
+}
+
+func Monitor() {
+	fmt.Println("b000yah")
+	collector := &monitor.Collector{}
+	for _, p := range monitor.Plugins {
 		p.SysExec(collector)
 		//p.Send(monitChannel)
 	}
+	fmt.Println(collector.CpuStat.Cpu.User)
+
 }

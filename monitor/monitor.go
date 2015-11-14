@@ -1,4 +1,4 @@
-package monit
+package monitor
 
 import (
 	//  "fmt"
@@ -7,17 +7,17 @@ import (
 
 type Collector struct {
 	//this contain all the metrics
-	Cpu []*CpuStat
+	CpuStat *CpuStat
 }
-type Monit interface {
+type Monitor interface {
 	SysExec(collector *Collector)
 	//Send()
 }
 
-var Plugins = make(map[string]Monit)
+var Plugins = make(map[string]Monitor)
 
 //returns a monit interface
-func RegisterPlugin(name string, plugin Monit) {
+func RegisterPlugin(name string, plugin Monitor) {
 	if plugin == nil {
 		log.Error("Cannot register an empty plugin")
 	} else {
@@ -26,7 +26,3 @@ func RegisterPlugin(name string, plugin Monit) {
 	}
 
 }
-
-///func (col *Collector) Add() {
-//  col.
-//}

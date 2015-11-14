@@ -12,7 +12,7 @@ import (
 )
 
 const (
-	STAT    = "stat" //Contants
+	STAT    = "stat"
 	CPUINFO = "cpuinfo"
 )
 
@@ -55,7 +55,7 @@ func (c *CpuStat) SysExec(rec *Collector) {
 			c.Cpu = all
 		}
 	}
-	rec.Cpu = append(rec.Cpu, c)
+	rec.CpuStat = append(rec.CpuStat, c)
 }
 func CheckCPU(cpuKey string) []string {
 	re := regexp.MustCompile("[0-9]+")
