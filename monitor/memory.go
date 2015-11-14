@@ -1,16 +1,11 @@
 package monitor
 
-/*
 import (
 	"bufio"
 	"bytes"
 	"fmt"
-	"io/ioutil"
-	"regexp"
 	"strings"
 	"time"
-
-	log "github.com/Sirupsen/logrus"
 )
 
 const (
@@ -18,11 +13,6 @@ const (
 )
 
 type MemStat struct {
-	Memory    []*Memory
-	Timestamp time.Time
-}
-
-type Memory struct {
 	MemTotal          int64 `json:"mem_total,omitempty"`
 	MemFree           int64 `json:"mem_free,omitempty"`
 	Buffers           int64 `json:"buffers,omitempty"`
@@ -68,85 +58,109 @@ type Memory struct {
 	DirectMap1G       int64 `json:"direct_map1_g,omitempty"`
 }
 
-func (c *MemStat) SysExec(rec *Collector) {
-	//time.Sleep(1000 * time.Millisecond)
+func (m *MemStat) SysExec(rec *Collector) {
+	time.Sleep(1000 * time.Millisecond)
 	//NumCores := getNumCores()
-	statData, _ := procRead(MEMORY_INFO)
+	statData, _ := ProcRead(MEMORY_INFO)
+	fmt.Println(statData)
+	scanner := bufio.NewScanner(bytes.NewReader([]byte(statData)))
+	for scanner.Scan() {
+		fields := strings.Fields(scanner.Text())
+		if len(fields) >= 2 {
+			value := parseInt64(fields[1])
 
-	newScanner := bufio.NewScanner(bytes.NewReader([]byte(statData)))
-	for newScanner.Scan() {
-		fmt.Println(newScanner.Text())
-				singleLine := newScanner.Text()
-				fields := strings.Fields(singleLine)
-				cpuKey := fields[0]
-
-				if strings.HasPrefix(cpuKey, "cpu") && CheckCPU(cpuKey) != nil {
-					z := parseCore(fields)
-					c.Cores = append(c.Cores, z)
-				} else if strings.HasPrefix(cpuKey, "cpu") {
-					all := parseCore(fields)
-					c.Cpu = all
-				}
-	}
-	rec.CpuStat = append(rec.CpuStat, c)
-}
-func CheckCPU(cpuKey string) []string {
-	re := regexp.MustCompile("[0-9]+")
-	no := re.FindAllString(cpuKey, -1)
-	return no
-}
-
-func parseCore(f []string) *Core {
-
-	core := &Core{ //terrible piece of design - get validated schema
-		Id:    f[0],
-		User:  f[1],
-		Nice:  f[2],
-		Sys:   f[3],
-		Irq:   f[4],
-		Soft:  f[5],
-		Steal: f[6],
-		Guest: f[7],
-		Gnice: f[8],
-		Idle:  f[9],
-	}
-
-	return core
-}
-
-//TODO: Move this out to  common
-func procRead(t string) (string, error) {
-	p, e := ioutil.ReadFile("/proc/" + t)
-	if e != nil {
-		log.Error("Error in reading proc file ", t)
-		return "", e
-	}
-	d := string(p)
-	return d, nil
-}
-
-//func (c *CpuStat) Send() {}
-
-func init() {
-	RegisterPlugin("cpu", &CpuStat{})
-}
-
-//TODO: temporary hack, move this out and return a full cpu_info struct
-func getNumCores() string {
-
-	mi, _ := procRead(CPUINFO)
-	newScanner := bufio.NewScanner(bytes.NewReader([]byte(mi)))
-	var NumCores string
-	for newScanner.Scan() {
-		line := newScanner.Text()
-		cores := strings.Split(line, ":")
-
-		cpuKey := cores[0]
-		if strings.HasPrefix(cpuKey, "cpu cores") {
-			NumCores = cores[1]
-
+			switch fields[0] {
+			case "MemTotal:":
+				m.MemTotal = value
+			case "MemFree:":
+				m.MemFree = value
+			case "Buffers:":
+				m.Buffers = value
+			case "Cached:":
+				m.Cached = value
+			case "SwapCached:":
+				m.SwapCached = value
+			case "Active:":
+				m.Active = value
+			case "Inactive:":
+				m.Inactive = value
+			case "Active(anon):":
+				m.ActiveAnon = value
+			case "Inactive(anon):":
+				m.InactiveAnon = value
+			case "Active(file):":
+				m.ActiveFile = value
+			case "Inactive(file):":
+				m.InactiveFile = value
+			case "Unevictable:":
+				m.Unevictable = value
+			case "Mlocked:":
+				m.Mlocked = value
+			case "SwapTotal:":
+				m.SwapTotal = value
+			case "SwapFree:":
+				m.SwapFree = value
+			case "Dirty:":
+				m.Dirty = value
+			case "Writeback:":
+				m.Writeback = value
+			case "AnonPages:":
+				m.AnonPages = value
+			case "Mapped:":
+				m.Mapped = value
+			case "Shmem:":
+				m.Shmem = value
+			case "Slab:":
+				m.Slab = value
+			case "SReclaimable:":
+				m.SReclaimable = value
+			case "SUnreclaim:":
+				m.SUnreclaim = value
+			case "KernelStack:":
+				m.KernelStack = value
+			case "PageTables:":
+				m.PageTables = value
+			case "NFS_Unstable:":
+				m.NFS_Unstable = value
+			case "Bounce:":
+				m.Bounce = value
+			case "WritebackTmp:":
+				m.WritebackTmp = value
+			case "CommitLimit:":
+				m.CommitLimit = value
+			case "Committed_AS:":
+				m.Committed_AS = value
+			case "VmallocTotal:":
+				m.VmallocTotal = value
+			case "VmallocUsed:":
+				m.VmallocUsed = value
+			case "VmallocChunk:":
+				m.VmallocChunk = value
+			case "HardwareCorrupted:":
+				m.HardwareCorrupted = value
+			case "AnonHugePages:":
+				m.AnonHugePages = value
+			case "HugePages_Total:":
+				m.HugePages_Total = value
+			case "HugePages_Free:":
+				m.HugePages_Free = value
+			case "HugePages_Rsvd:":
+				m.HugePages_Rsvd = value
+			case "HugePages_Surp:":
+				m.HugePages_Surp = value
+			case "Hugepagesize:":
+				m.Hugepagesize = value
+			case "DirectMap4k:":
+				m.DirectMap4k = value
+			case "DirectMap2M:":
+				m.DirectMap2M = value
+			case "DirectMap1G:":
+				m.DirectMap1G = value
+			}
 		}
 	}
-	return NumCores
 }
-*/
+
+func init() {
+	RegisterPlugin("memory", &MemStat{})
+}

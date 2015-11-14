@@ -44,5 +44,6 @@ func Monitor() {
 		//p.Send(monitChannel)
 	}
 	fmt.Println(collector.CpuStat.Cpu.User)
+	fmt.Println(collector.MemStat.MemTotal)
 
 }

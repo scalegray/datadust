@@ -8,6 +8,7 @@ import (
 type Collector struct {
 	//this contain all the metrics
 	CpuStat *CpuStat
+	MemStat *MemStat
 }
 type Monitor interface {
 	SysExec(collector *Collector)
@@ -16,7 +17,7 @@ type Monitor interface {
 
 var Plugins = make(map[string]Monitor)
 
-//returns a monit interface
+//returns a monitor interface
 func RegisterPlugin(name string, plugin Monitor) {
 	if plugin == nil {
 		log.Error("Cannot register an empty plugin")
@@ -24,5 +25,4 @@ func RegisterPlugin(name string, plugin Monitor) {
 		Plugins[name] = plugin
 		log.Info("Registered plugin: ", name)
 	}
-
 }

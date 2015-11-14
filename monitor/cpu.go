@@ -1,14 +1,11 @@
-package monit
+package monitor
 
 import (
 	"bufio"
 	"bytes"
-	"io/ioutil"
 	"regexp"
 	"strings"
 	"time"
-
-	log "github.com/Sirupsen/logrus"
 )
 
 const (
@@ -39,11 +36,11 @@ type Core struct {
 func (c *CpuStat) SysExec(rec *Collector) {
 	time.Sleep(1000 * time.Millisecond)
 	//NumCores := getNumCores()
-	statData, _ := procRead(STAT)
+	statData, _ := ProcRead(STAT)
 
-	newScanner := bufio.NewScanner(bytes.NewReader([]byte(statData)))
-	for newScanner.Scan() {
-		singleLine := newScanner.Text()
+	scanner := bufio.NewScanner(bytes.NewReader([]byte(statData)))
+	for scanner.Scan() {
+		singleLine := scanner.Text()
 		fields := strings.Fields(singleLine)
 		cpuKey := fields[0]
 
@@ -55,7 +52,7 @@ func (c *CpuStat) SysExec(rec *Collector) {
 			c.Cpu = all
 		}
 	}
-	rec.CpuStat = append(rec.CpuStat, c)
+	rec.CpuStat = c
 }
 func CheckCPU(cpuKey string) []string {
 	re := regexp.MustCompile("[0-9]+")
@@ -81,17 +78,6 @@ func parseCore(f []string) *Core {
 	return core
 }
 
-//TODO: Move this out to  common
-func procRead(t string) (string, error) {
-	p, e := ioutil.ReadFile("/proc/" + t)
-	if e != nil {
-		log.Error("Error in reading proc file ", t)
-		return "", e
-	}
-	d := string(p)
-	return d, nil
-}
-
 //func (c *CpuStat) Send() {}
 
 func init() {
@@ -101,7 +87,7 @@ func init() {
 //TODO: temporary hack, move this out and return a full cpu_info struct
 func getNumCores() string {
 
-	mi, _ := procRead(CPUINFO)
+	mi, _ := ProcRead(CPUINFO)
 	newScanner := bufio.NewScanner(bytes.NewReader([]byte(mi)))
 	var NumCores string
 	for newScanner.Scan() {

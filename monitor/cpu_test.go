@@ -1,12 +1,6 @@
-package monit
+package monitor
 
-import (
-	"testing"
-  "fmt"
-
-
-	"gopkg.in/check.v1"
-)
+import "testing"
 
 func Test(t *testing.T) {
 	check.TestingT(t)
@@ -18,6 +12,6 @@ var _ = check.Suite(&S{})
 
 func (s *S) TestprocRead(c *check.C) {
 
-_ ,error := procRead("stat")
+	_, error := procRead("stat")
 	c.Assert(error, check.IsNil)
 }
