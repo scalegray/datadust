@@ -18,6 +18,7 @@
 package main
 
 import (
+	"encoding/json"
 	"fmt"
 	"net/http"
 	"time"
@@ -28,22 +29,27 @@ import (
 const CPU = "cpu"
 
 func main() {
+	collector := &monitor.Collector{}
+
 	for {
-		Monitor()
-		time.Sleep(100 * time.Millisecond)
+		getMetrics(collector)
+		time.Sleep(1000 * time.Millisecond)
 
 	}
 	http.ListenAndServe("localhost:9999", nil)
 }
 
-func Monitor() {
-	fmt.Println("b000yah")
-	collector := &monitor.Collector{}
+func getMetrics(c *monitor.Collector) {
 	for _, p := range monitor.Plugins {
-		p.SysExec(collector)
+		p.SysExec(c)
 		//p.Send(monitChannel)
 	}
-	fmt.Println(collector.CpuStat.Cpu.User)
-	fmt.Println(collector.MemStat.MemTotal)
+	postData(c)
+}
 
+func postData(c *monitor.Collector) {
+	fmt.Println("conveverting data")
+	data, _ := json.Marshal(c)
+	fmt.Println("==================")
+	fmt.Println(string(data))
 }

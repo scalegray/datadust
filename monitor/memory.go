@@ -3,9 +3,7 @@ package monitor
 import (
 	"bufio"
 	"bytes"
-	"fmt"
 	"strings"
-	"time"
 )
 
 const (
@@ -59,10 +57,8 @@ type MemStat struct {
 }
 
 func (m *MemStat) SysExec(rec *Collector) {
-	time.Sleep(1000 * time.Millisecond)
 	//NumCores := getNumCores()
 	statData, _ := ProcRead(MEMORY_INFO)
-	fmt.Println(statData)
 	scanner := bufio.NewScanner(bytes.NewReader([]byte(statData)))
 	for scanner.Scan() {
 		fields := strings.Fields(scanner.Text())
@@ -159,6 +155,7 @@ func (m *MemStat) SysExec(rec *Collector) {
 			}
 		}
 	}
+	rec.MemStat = m
 }
 
 func init() {

@@ -34,9 +34,9 @@ type Core struct {
 }
 
 func (c *CpuStat) SysExec(rec *Collector) {
-	time.Sleep(1000 * time.Millisecond)
 	//NumCores := getNumCores()
 	statData, _ := ProcRead(STAT)
+	var cor []*Core
 
 	scanner := bufio.NewScanner(bytes.NewReader([]byte(statData)))
 	for scanner.Scan() {
@@ -45,13 +45,17 @@ func (c *CpuStat) SysExec(rec *Collector) {
 		cpuKey := fields[0]
 
 		if strings.HasPrefix(cpuKey, "cpu") && CheckCPU(cpuKey) != nil {
+
 			z := parseCore(fields)
-			c.Cores = append(c.Cores, z)
+			cor = append(cor, z)
 		} else if strings.HasPrefix(cpuKey, "cpu") {
 			all := parseCore(fields)
 			c.Cpu = all
 		}
+
 	}
+	c.Cores = cor
+
 	rec.CpuStat = c
 }
 func CheckCPU(cpuKey string) []string {
@@ -61,7 +65,6 @@ func CheckCPU(cpuKey string) []string {
 }
 
 func parseCore(f []string) *Core {
-
 	core := &Core{ //terrible piece of design - get validated schema
 		Id:    f[0],
 		User:  f[1],
